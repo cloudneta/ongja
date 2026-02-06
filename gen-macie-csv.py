@@ -83,7 +83,7 @@ def gen_rows(n: int):
                 "Requested invoice email",
                 "Address change requested",
                 "Call back needed",
-                "No special notes",
+                "No special notes", 
             ]),
         })
     return rows
@@ -158,10 +158,6 @@ AWS_REGION=ap-northeast-2
 AWS_ACCESS_KEY_ID={access_key}
 AWS_SECRET_ACCESS_KEY={secret_key}
 
-# S3
-S3_BUCKET={bucket_name}
-S3_PREFIX=upload/
-
 # External API
 PAYMENT_API_ENDPOINT=https://api.payment.example.com
 PAYMENT_API_KEY=pk_live_{rand_digits(20)}
@@ -184,12 +180,7 @@ def main():
     rows = gen_rows(60)
     write_csv("customer-data.csv", rows)
     write_safe_csv("customer-data-safe.csv", rows)
-
-    # CNASG 버킷 네이밍 규칙 반영: cnasg-${NICKNAME}-customer-data
-    nickname = "ongja"  # <- 필요하면 argparse로 받게 바꿔도 됨
-    bucket = f"cnasg-{nickname}-customer-data"
-    write_env("config.env", bucket)
-
+    write_env("config.env")
     print("generated: customer-data.csv, customer-data-safe.csv, config.env")
 
 if __name__ == "__main__":
