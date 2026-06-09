@@ -28,7 +28,18 @@ def init_db():
     )
     """)
 
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER,
+        username TEXT,
+        password TEXT,
+        role TEXT
+    )
+    """)
+
     cur.execute("DELETE FROM menu")
+
+    cur.execute("DELETE FROM users")
 
     cur.executemany(
         "INSERT INTO menu VALUES (?, ?, ?)",
@@ -38,6 +49,15 @@ def init_db():
             (3, "기가 바닐라 라떼", 3400),
             (4, "기가 콜드브루", 3300),
             (5, "기가 모카", 3900),
+        ]
+    )
+
+    cur.executemany(
+        "INSERT INTO users VALUES (?, ?, ?, ?)",
+        [
+            (1, "admin", "coffee123", "admin"),
+            (2, "manager", "manager123", "manager"),
+            (3, "staff", "staff123", "staff"),
         ]
     )
 
@@ -594,19 +614,35 @@ def login():
         username = request.form.get("username", "")
         password = request.form.get("password", "")
 
-        if username == "admin" and password == "coffee123":
+        conn = sqlite3.connect(DB)
+        cur = conn.cursor()
+
+        cur.execute(
+            """
+            SELECT username, role
+            FROM users
+            WHERE username = ?
+            AND password = ?
+            """,
+            (username, password)
+        )
+
+        user = cur.fetchone()
+
+        conn.close()
+
+        if user:
 
             resp = make_response(
                 redirect("/admin?auth=true")
-
             )
 
             resp.set_cookie(
                 "GIGA_ADMIN_SESSION",
-                "admin-8f3a9c2d7a91"
+                f"{user[0]}-{user[1]}-8f3a9c2d7a91"
             )
-            
-            return resp    
+
+            return resp
 
         else:
 
@@ -664,7 +700,9 @@ def login():
 @app.route("/admin")
 def admin():
 
-    if request.cookies.get("GIGA_ADMIN_SESSION") != "admin-8f3a9c2d7a91":
+    session = request.cookies.get("GIGA_ADMIN_SESSION", "")
+    
+    if not session.endswith("-8f3a9c2d7a91"):
 
         return page("""
 
