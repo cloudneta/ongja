@@ -30,11 +30,14 @@ for i in $(seq 1 30); do
   sleep 3
 done
 
-# 4. libuser를 X.509 인증서 기반 계정으로 재생성
+# 4. libuser(앱용 비밀번호 방식) 복원 + teleport(Teleport DB Access 전용 인증서 방식) 추가
 kubectl exec deploy/library-db -- mysql -h 127.0.0.1 -u root -prootpass1234 -e "
 DROP USER IF EXISTS 'libuser'@'%';
-CREATE USER 'libuser'@'%' REQUIRE SUBJECT '/CN=libuser';
+CREATE USER 'libuser'@'%' IDENTIFIED BY 'libpass1234';
 GRANT ALL PRIVILEGES ON librarydb.* TO 'libuser'@'%';
+
+CREATE USER 'teleport'@'%' REQUIRE SUBJECT '/CN=teleport';
+GRANT ALL PRIVILEGES ON librarydb.* TO 'teleport'@'%';
 FLUSH PRIVILEGES;
 "
 
