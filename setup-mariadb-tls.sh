@@ -24,7 +24,7 @@ kubectl patch deployment library-db --type='json' -p='[
 kubectl rollout status deployment/library-db --timeout=120s
 
 # 4. libuser를 X.509 인증서 기반 계정으로 재생성
-kubectl exec deploy/library-db -- mysql -u root -prootpass1234 -e "
+kubectl exec deploy/library-db -- mysql -h 127.0.0.1 -u root -prootpass1234 -e "
 DROP USER IF EXISTS 'libuser'@'%';
 CREATE USER 'libuser'@'%' REQUIRE SUBJECT '/CN=libuser';
 GRANT ALL PRIVILEGES ON librarydb.* TO 'libuser'@'%';
