@@ -23,6 +23,13 @@ kubectl patch deployment library-db --type='json' -p='[
 # 3. 파드가 뜰 때까지 대기
 kubectl rollout status deployment/library-db --timeout=120s
 
+# MariaDB가 실제로 ready될 때까지 대기
+echo "Waiting for MariaDB to be ready..."
+for i in $(seq 1 30); do
+  kubectl exec deploy/library-db -- mysql -h 127.0.0.1 -u root -prootpass1234 -e "SELECT 1" > /dev/null 2>&1 && break
+  sleep 3
+done
+
 # 4. libuser를 X.509 인증서 기반 계정으로 재생성
 kubectl exec deploy/library-db -- mysql -h 127.0.0.1 -u root -prootpass1234 -e "
 DROP USER IF EXISTS 'libuser'@'%';
