@@ -9,7 +9,7 @@ kubectl create secret generic mariadb-tls \
   --from-literal=ssl.cnf='[mysqld]
 ssl-ca=/etc/mysql/tls/server.cas
 ssl-cert=/etc/mysql/tls/server.crt
-ssl-key=/etc/mysql/tls/server.key
+ssl-key=/etc/mysql/tls/server.key'
 
 # 2. Deployment에 마운트 추가
 kubectl patch deployment library-db --type='json' -p='[
