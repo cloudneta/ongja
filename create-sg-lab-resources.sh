@@ -19,7 +19,7 @@ NORMAL_SG_ID=$(aws ec2 describe-security-groups \
 
 aws ec2 authorize-security-group-ingress \
   --group-id ${NORMAL_SG_ID} \
-  --protocol tcp --port 22 --cidr $(curl -s ipinfo.io/ip)/32
+  --protocol tcp --port 22 --cidr 192.168.0.0/16
 
 # 취약 보안그룹 생성 (NON_COMPLIANT 대상)
 aws ec2 create-security-group \
